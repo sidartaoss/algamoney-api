@@ -11,10 +11,96 @@
 	<name>algamoney-api</name>
 	<description>Demo project for Spring Boot</description>
 
+<!--  
+* Aula 25.01. Atualizando para o Spring Boot 2
+*
+* Vamos la para mais um Capitulo de Atualizacoes, agora, aqui, este Capitulo para atualizarmos para o Spring Boot 2 e, de quebra, dentre varias outras 
+* atualizacoes que vem junto, as mais importantes sao, tambem, Spring Security 5, que vem junto com Spring Boot 2, e tambem Spring Data JPA 2. 
+*
+* E nos destacamos esses dois frameworks, Spring Security 5 e Spring Data JPA, porque a gente vai precisar mexer no nosso projeto por causa das 
+* atualizacoes deles. Quanto as outras atualizacoes que o Spring Boot 2 traz junto consigo, a gente nao vai precisar mexer em mais nada, somente nesses dois 
+* frameworks, por isso que destacamos aqui, alem do Spring Boot 2, claro, a gente vai atualizar a nossa API para o Spring Security 5 e Spring Data JPA 2.
+* 
+* E, nesta aula aqui, o que a gente vai fazer eh, simplesmente, atualizar o nosso POM.xml. Depois que a gente atualizar a nosso POM, o nosso projeto vai ter, ali, 
+* alguns problemas e a gente vai quebrar essas correcoes em algumas aulas ao longo deste Capitulo.
+* 
+* Entao, para isso, nos vamos abrir o STS para a gente poder atualizar o nosso POM. Aqui, este projeto que acabamos de abrir, eh o Projeto da Aula 24.02, que 
+* foi a ultima aula, onde a gente trabalhou com a API, entao, nos estamos com o exato Projeto da aula 24.02. 
+*
+* 1. Agora, nos vamos abrir o POM para a gente fazer as atualizacoes necessarias. Nao sao muitas atualizacoes, sao atualizacoes simples.
+*
+* 2. O que a gente vai fazer aqui eh alterar da versao do Spring Boot, entao, 1.5.10 para a 2.0.2, que eh a ultima versao no momento em que gravamos esta 
+* aula aqui.
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.5.3.RELEASE</version>
+		<version>2.0.2.RELEASE</version>
+		<relativePath/>
+	</parent>
+*
+* 3. Outra coisa que iremos fazer eh a atualizacao de duas dependencias relacionadas ao Spring Security, que sao:
+	<properties>
+		<spring-security-oauth2.version>2.2.1.RELEASE</spring-security-oauth2.version>
+		<spring-security-jwt.version>1.0.9.RELEASE</spring-security-jwt.version>
+	</properties>
+	
+* 4. Por que estamos colando dentro de <properties/>? Porque, no Spring Boot 2, a gente nao vai ter essas versoes ja pre-configuradas, entao a gente vai ter que
+* colar aqui na tag <properties> as tags do Spring Security.
+*
+* 5. Agora, nos temos que especificar a versao de spring-security-oauth2 e spring-security-jwt nas dependencias. Entao, o que nos vamos fazer? 
+* Nos vamos colar a propriedade nas dependencias correspondentes.
+*
+		<dependency>
+			<groupId>org.springframework.security.oauth</groupId>
+			<artifactId>spring-security-oauth2</artifactId>
+			<version>${spring-security-oauth2}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-jwt</artifactId>
+			<version>${spring-security-jwt}</version>
+		</dependency>		
+*
+* 6. Comando CTRL+K eh o comando para procurar a proxima ocurrencia do que foi selecionado.
+*
+* 7. Feito isso, nos atualizamos para o Spring Boot 2 e fizemos algumas correcoes, porque, antes, essas duas dependencias estavam com as versoes 
+* pre-configuradas no Parent do Spring Boot,
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.0.2.RELEASE</version>
+		<relativePath/>
+	</parent>
+*
+* e, agora, nao tem mais. Entao, a gente precisa especificar, deixar explicito a vesao de cada uma das dependencias. 
+* 
+* 8. Outra coisa que a gente vai precisar fazer, na verdade, sao coisas que a gente nao precisa, eh especificar as versoes do Thymeleaf. Agora, no Spring Boot 2,
+* a gente ja tem as versoes mais recentes do Thymeleaf, entao, a gente nao precisa especificar aqui. Caso nao lembremos, o Thymeleaf a gente usa para 
+* configurar o Template HTML para o envio de e-mail. Entao, como a gente ja tem isso configurado certinho, podemos remover, a gente nao precisa mais,
+*
+         <thymeleaf.version>3.0.9.RELEASE</thymeleaf.version>
+        <thymeleaf-layout-dialect.version>2.2.2</thymeleaf-layout-dialect.version>
+        <thymeleaf-extras-data-attribute.version>2.0.1</thymeleaf-extras-data-attribute.version>
+        <thymeleaf-extras-java8time.version>3.0.0.RELEASE</thymeleaf-extras-java8time.version>
+* 
+* 9. Agora, vao dar alguns problemas, os quais serao corrigidos nas proximas aulas. Nos so vamos mandar reiniciar o Servidor novamente para baixar as 
+* dependencias. 
+*
+* 10. Nos temos problemas nas classes que estavam utilizando metodos do Spring Data JPA, entao, isso a gente vai corrigir nas proximas aulas. Com relacao a
+* seguranca, nao ha um erro explicito nas classes do pacote .config, mas a gente vai ter problemas que a gente vai ter que precisar corrigir.
+*
+* 11. Como dito, nos iremos fazer isso nas proximas aulas.
+*
+* 12. Fim da  Aula 25.01. Atualizando para o Spring Boot 2.
+-->
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<!--version>1.5.3.RELEASE</version-->
+		<!-- Aula 22.1. Preparação do retorno dos dados para os gráficos -->
+		<version>2.0.2.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
@@ -22,6 +108,32 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
+		<!-- 	
+				* Aula 22.13. Gerando os Bytes do Relatorio
+				* Versoes JasperReports 
+		-->
+		
+		<spring-security-oauth2.version>2.2.1.RELEASE</spring-security-oauth2.version>
+		<spring-security-jwt.version>1.0.9.RELEASE</spring-security-jwt.version>
+				
+		<jasperreports.version>6.5.1</jasperreports.version>
+		<jasperreports-functions.version>6.5.1</jasperreports-functions.version>
+		<jasperreports-fonts.version>6.0.0</jasperreports-fonts.version>
+		
+		<!-- Aula 22.19. Processando o Template e Enviando o E-mail. -->
+		<!-- Versoes Thymeleaf
+        <thymeleaf.version>3.0.9.RELEASE</thymeleaf.version>
+        <thymeleaf-layout-dialect.version>2.2.2</thymeleaf-layout-dialect.version>
+        <thymeleaf-extras-data-attribute.version>2.0.1</thymeleaf-extras-data-attribute.version>
+        <thymeleaf-extras-java8time.version>3.0.0.RELEASE</thymeleaf-extras-java8time.version>
+        -->
+	    <!--
+	     	* 2. Antes de comecar a configurar a instancia da Classe AmazonS3, que eh a instancia que a 
+ 			* gente vai precisar, nos vamos adicionar o PATH da API da Amazon no pom.xml.
+ 			* Primeiramente, nos vamos adicionar a versao logo abaixo das versoes do Thymeleaf:
+ 			* <aws-java-sdk.version>1.11.274</aws-java-sdk.version>
+	     -->
+	     <aws-java-sdk.version>1.11.274</aws-java-sdk.version>
 	</properties>
 
 	<dependencies>
@@ -51,13 +163,12 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<scope>runtime</scope>
 		</dependency>
-		<!-- hsqldb
-		<dependency>
-			<groupId>hsqldb</groupId>
-			<artifactId>hsqldb</artifactId>
-			<version>1.8.0.10</version>
-		</dependency>		
-		-->
+		<!-- https://mvnrepository.com/artifact/org.hsqldb/hsqldb -->
+		<!-- dependency>
+		    <groupId>org.hsqldb</groupId>
+		    <artifactId>hsqldb</artifactId>
+		    <version>2.4.0</version>
+		</dependency-->		
 		<!-- Migracoes - Flyway -->
 		<dependency>
 			<groupId>org.flywaydb</groupId>
@@ -101,12 +212,14 @@
 		<dependency>
 			<groupId>org.springframework.security.oauth</groupId>
 			<artifactId>spring-security-oauth2</artifactId>
+			<version>${spring-security-oauth2.version}</version>
 		</dependency>
 		
 		<!-- Dependência para trabalhar com JWT -->
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-jwt</artifactId>
+			<version>${spring-security-jwt.version}</version>
 		</dependency>
 
 		<dependency>
@@ -114,6 +227,57 @@
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
 		</dependency>
+		
+		<!-- 	
+				* Aula 22.13. Gerando os Bytes do Relatorio
+				* Dependencias JasperReports 
+		-->
+		<dependency>
+		    <groupId>net.sf.jasperreports</groupId>
+		    <artifactId>jasperreports</artifactId>
+		    <version>6.5.1</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports-fonts</artifactId>
+			<version>6.0.0</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports-functions</artifactId>
+			<version>6.5.1</version>
+		</dependency>		
+
+		<!-- Email -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+		
+		<!-- Aula 22.19. Processando o Template e Enviando o E-mail. -->
+		<!-- Thymeleaf -->
+		<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.thymeleaf.extras</groupId>
+            <artifactId>thymeleaf-extras-java8time</artifactId>
+        </dependency>
+
+		<!-- Amazon S3
+		    * 3. Antes de comecar a configurar a instancia da Classe AmazonS3, que eh a instancia que a 
+ 			* gente vai precisar, nos vamos adicionar o PATH da API da Amazon no pom.xml.
+ 			* Agora, podemos voltar na classe de configuracao S3Config.java.
+ 			* Ver S3Config.java.
+		 -->
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk</artifactId>
+            <version>${aws-java-sdk.version}</version>
+        </dependency>		 
 	</dependencies>
 
 	<build>
@@ -125,5 +289,13 @@
 		</plugins>
 	</build>
 
+	<!--  	* Aula 22.13. Gerando os Bytes do Relatorio
+			* Definir o Repositorio do Jasper para fazermos o download das versoes que precisamos. -->
+	<repositories>
+		<repository>
+			<id>jr-ce-releases</id>
+			<url>http://jaspersoft.artifactoryonline.com/jaspersoft/jr-ce-releases</url>
+		</repository>
+	</repositories>
 
 </project>

@@ -1,6 +1,7 @@
 package com.example.algamoney.api.resource;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -34,11 +35,11 @@ public class CategoriaResource {
 	/**
 	 * CORS - Cross-origin resource sharing
 	 * 
-	 * N�o ser� utilizado neste Projeto porque integra��o com Spring Security OAuth2 n�o est�
-	 * legal nesta vers�o do Spring Security.
+	 * Nao sera utilizado neste Projeto porque integracao com Spring Security OAuth2 nao esta
+	 * legal nesta versao do Spring Security.
 	 * 
-	 * Com o CORS, como a Requisi��o de Preflight � o Browser quem faz sem passar as Credenciais de Seguran�a,
-	 * o Spring Security n�o permite fazer a Requisi��o.
+	 * Com o CORS, como a Requisicao de Preflight eh o Browser quem faz sem passar as Credenciais de Seguranca,
+	 * o Spring Security nao permite fazer a Requisicao.
 	 * 
 	 * 
 <html>
@@ -190,11 +191,26 @@ public class CategoriaResource {
 		return ResponseEntity.status(HttpStatus.CREATED).body(categoriaSalva);
 	}
 	
+	/**
+	 * Aula 25.02. Novas Assinaturas do Spring Data JPA
+	 * 
+	 * 10. Com a migracao para o Spring Boot 2, corrigir o metodo buscarPeloCodigo, substituindo o metodo findOne() por findById().
+	 * Vamos corrigir o retorno tambem, return categoria.isPresent() ? ResponseEntity.ok(categoria.get()) : ResponseEntity.notFound().build();
+	 * 
+	 * 11. Vamos corrigir, agora, LancamentoResource.
+	 * Ver LancamentoResource.java.
+	 * 
+	 * @param codigo
+	 * @return
+	 */
+	
 	@PreAuthorize("hasAuthority('ROLE_PESQUISAR_CATEGORIA') and #oauth2.hasScope('read')")
 	@GetMapping("/{codigo}")
 	public ResponseEntity<Categoria> buscarPeloCodigo(@PathVariable Long codigo) {
-		 Categoria categoria = categoriaRepository.findOne(codigo);
-		 return categoria != null ? ResponseEntity.ok(categoria) : ResponseEntity.notFound().build();
+		 /** Categoria categoria = categoriaRepository.findOne(codigo); **/
+		Optional<Categoria> categoria = categoriaRepository.findById(codigo);
+		 /** return categoria != null ? ResponseEntity.ok(categoria) : ResponseEntity.notFound().build(); */
+		return categoria.isPresent() ? ResponseEntity.ok(categoria.get()) : ResponseEntity.notFound().build();
 	}
 	
 }

@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
@@ -82,13 +83,76 @@ import com.example.algamoney.api.config.token.CustomTokenEnhancer;
  */
 @Profile("oauth-security")
 @Configuration
-@EnableAuthorizationServer
+/**
+ * Aula 25.03. Modificacoes para o Spring Security 5
+ * 
+ *  8.1. Agora, vamos abrir as classes AuthorizatonServerConfig e ResourceServerConfig. O que vamos fazer? Nos vamos pegar
+ *  e recortar as anotacoes, por exemplo, essa anotacao de @EnableAuthorizationServer em AuthorizationServerConfig e vamos colar em 
+ *  OAuthSecurityConfig, nos vamos concentrar tudo nessa classe, porque, ja que a gente tem uma classe aqui que vai concentrar o 
+ *  que eh comum nas configuracoes do OAuth, entao nos vamos pegar as anotacoes e vamos colocar em OAuthSecurityConfig.
+ *  
+ *  8.2. As anotacoes que ficam definidas para a classe AuthorizationServerConfig sao apenas @Profile("oauth-security") e @Configuration.
+ *  Voltar para a classe OAuthSecurityConfig.java. 
+ */
+/** @EnableAuthorizationServer **/
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
 
+	/**
+	 * Aula 25.03. Modificacoes para o Spring Security 5
+	 *
+	 * Nesta aula aqui, o que a gente vai fazer aqui eh a adaptacao para a nova API do Spring Security, junto com o Oauth, para as novas versoes, porque, do 
+	 * jeito que esta aqui, a gente esta com o profile Basic-Security ainda configurado no application-properties, spring.profiles.active=basic-security. 
+	 *
+	 * 1. Com ele, vai funcionar beleza, vamos levantar a Aplicacao e abrir uma nova Aba no Postman. Selecionar Authorization Basic Auth, Username 
+	 * admin@algamoney.com, Password admin, URL http://localhost:8080/lancamentos, se fizermos uma Requisicao, vem o Resultado, com Status 200 Ok.
+	 *
+	 * 2. Com Basic-Security, esta tudo okay, mas, se definirmos, em application-properties, spring.profiles.active como oauth-security, a gente vai comecar 
+	 * a ter problemas, 
+	 *
+	 *	***************************
+	 *	APPLICATION FAILED TO START
+	 *	***************************
+	 *	
+	 *	Description:
+	 *	
+	 *	Field authenticationManager in com.example.algamoney.api.config.AuthorizationServerConfig required a bean of type 
+	 *'org.springframework.security.authentication.AuthenticationManager' that could not be found.
+	 *	
+	 *	Action:
+	 *	
+	 *	Consider defining a bean of type 'org.springframework.security.authentication.AuthenticationManager' in your configuration.
+	 *	
+	 *	, esta falando que o Campo authenticationManager la na nossa classe AuthorizationServerConfig eh requerido, mas ele nao foi encontrado. Por que? 
+	 * Teve algumas mudancas aqui. Nao sabemos muito ao certo o que esta acontecendo, pesquisamos isso na Internet e vimos algumas discussoes sobre isso. 
+	 * Vimos, ate, algumas pessoas reclamando o fato do authenticationManager nao estar mais sendo provido de forma automatica. Entao, a gente precisa dar 
+	 * um jeito nisso agora.
+	 *	
+	 *	3. Nos vamos abrir a nossa classe AuthorizationServerConfig. O campo authenticationManager nao esta mais sendo provido de uma forma mais automatica.
+	 * Nos vamos ter que fazer, aqui, uma pequena modificacao para que ele seja provido. 
+	 * 
+	 * 4. Antes de mexer nisso, verificamos que o nosso Projeto, na raiz, esta apontando um erro. Vamos clicar com o botao Direito em algamoney-api, opcao 
+	 * Maven - Update Project... - clicar em OK. Okay, sumiu o erro na raiz do Projeto. 
+	 * 
+	 *  5. Agora, voltando para a nossa Correcao do campo authenticationManager, vamos criar uma nova classe no pacote .config,
+	 *  que vai ser chamanda de OauthSecurityConfig. 
+	 *  Ver OauthSecurityConfig.java.
+	 *  
+	 *  15.1. Em AuthorizationServerConfig, vamos injetar mais uma propriedade, variavel de instancia de UserDetailsService,
+	 *  porque a gente vai precisar dessa instancia no metodo configure(AuthorizationServerEndpointsConfigurer endpoints).
+	 *  
+	 *  16. Antes, era o Spring Security que pegava UserDetailsService por detras dos panos e, agora, isso nao esta acontecendo e a gente vai
+	 *  precisar prover explicitamente. Sem essa instancia, a gente ate consegue gerar o token e utiliza-lo, mas a gente nao consegue dar um
+	 *  Refresh no Token. Quando a gente vai buscar a atualizacao do nosso Token de forma automatica, a gente nao consegue se a gente nao 
+	 *  tiver essa propriedade de UserDetailsService configurada. Entao, por isso que estamos configurando UserDetailsService.
+	 *   Voltar em ResourceServerConfig.java.
+	 */
 	/** 1. Injetar o AuthenticationManager 
 	 * Vai gerenciar a autenticacao, pegar usuario / senha da aplicacao. **/
 	@Autowired
 	private AuthenticationManager authenticationManager;
+	
+	@Autowired
+	private UserDetailsService userDetailsService;
 	
 	/** 2. Configurar a aplicacao; o Cliente. A aplicacao eh o cliente, eh quem o usuario esta usando. Vai autorizar esse Cliente
 	 * a acessar o Authorization Server. **/
@@ -101,7 +165,15 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 						/** Qual eh o nome do Cliente? CLIENTE_ID**/
 						.withClient("angular")
 						/** Qual eh a senha deste Cliente? CLIENTE_SECRET **/
-						.secret("@ngul@r0")
+						/** .secret("@ngul@r0") */
+						/** 
+						 * Aula 25.03. Modificacoes para o Spring Security 5
+						 * 
+						 * 22.1. Copiar o valor gerado em .security.util.GeradorSenha e colar no lugar da senha descriptografada em 
+						 * AuthorizationServerConfig, metodo configure(ClientDetailsServiceConfigurer clients), na chamada do 
+						 * metodo .secret().
+						 * **/
+						.secret("$2a$10$Jm/bFsrb9bpF.USxf.EiYeMaA/GJhGmHEKeYeHJQN.bQKA4pUFQXO")						
 						/** Qual eh o escopo deste Clinete? (Read/Write). 
 						 * Com a definicao de escopo, consegue limitar o acesso deste cliente (Aplicacao Angular). 
 						 * Quando vai usar a definicao de escopo? No momento de definir a autorizacao dos metodos no ResourceServerConfig:
@@ -120,7 +192,19 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 						/** Adicionar um novo Cliente para tratar o escopo.
 						 * Criando uma Aplicacao Mobile **/
 						.withClient("mobile")
-						.secret("m0b1l30")
+						/** .secret("m0b1l30") **/
+						/**
+						 * Aula 25.03. Modificacoes para o Spring Security 5
+						 * 
+						 * 23. A mesma coisa feita no item 22.1 fazer para a senha descriptografada abaixo: m0b1l30.
+						 * 
+						 * 24. Por uma questao didatica, estamos definindo a senha aqui, mas a intencao eh que nao se guarde aqui a senha.
+						 * Deve-se ter a senha em algum outro lugar seguro que nao no codigo-fonte, porque, se o pessoal do Spring, agora,
+						 * mudou o Spring para que a gente defina a criptografia da senha aqui no codigo-fonte, eh porque o pessoal do Spring
+						 * aconselha que nao armazenemos a senha aqui no codigo-fonte de forma transparente.
+						 * Voltar para ResourceServerConfig.java.
+						 */
+						.secret("$2a$10$q6x.9u.YgZonVsZsmhuWLOa5DDlp.EyUoweda64kX5IvBhgzYHhku")
 						/** Com escopo somente de Leitura. **/
 						.scopes("read")
 						.authorizedGrantTypes("password", "refresh_token")	
@@ -191,6 +275,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 				 * Se nao setar reuseRefreshTokens(false), o Refresh Token ter� o tempo de 24h apenas, ate buscar um novo Refresh Token
 				 * usando Password Credentials Flow. **/
 				.reuseRefreshTokens(false)
+				.userDetailsService(this.userDetailsService)
 				/** Utilizar o AuthenticationManager injetado para ele poder validar o Usu�rio / Senha. **/
 				.authenticationManager(authenticationManager);
 	}

@@ -1,0 +1,132 @@
+<!-- 
+Aula 22.18. Configurando o template para o envio do e-mail.
+
+Nesta aula, a gente vai preparar o template HTML para o envio de Email que a gente vai fazer mais para a frente. 
+O objetivo desta aula eh focar somente nesse HTML, nos formatarmos o HTML, porque, nas proximas aulas, a gente 
+cria esse metodo que vai processar esse HTML, junto com as variaveis dinamicas e fazer o envio de Email. 
+
+Antes, vamos entrar no site do Thymeleaf, que eh https://www.thymeleaf.org para falarmos um pouco sobre ele. O Thymeleaf eh um 
+template engine Java que eh muito utilizado para a criacao de paginas, aquelas paginas que sao processadas no servidor e em que ja 
+devolvemos todo o HTML com as informacoes para o Usuario final. Esse nao eh o nosso caso, mas a gente vai utilizar o Thymeleaf para 
+podermos fazer o processamento do HTML que a gente vai construir para poder fazer o envio de um Email formatado. Entao, nos iremos 
+utiliza-lo, ate porque muitas vezes em que procuramos sobre Spring Boot e Spring, nos ouvimos falar sobre Thymeleaf. Entao, sao dois 
+frameworks que estao bem ligados. O proprio Spring Boot da um suporte para o Thymeleaf e sem contar que ele eh muito poderoso, nao so a 
+questao de estar bem integrado com o Spring Boot, mas ele eh realmente muito bom, eh melhor, por exemplo, que JSP ou Velocity.
+
+Na Aba Docs do site do Thymeleaf, vemos os recursos que iremos utilizar: o Foreach (th:each), iremos usar esse recurso para iteracao, 
+eh como se fosse um foreach. Iremos utilizar th:each para iterarmos pelos Lancamentos e, depois, o th:text para ir escrevendo 
+cada <td> que tivermos.
+
+Voltando ao STS, vamos criar, agora, o nosso arquivo HTML em src/main/resources. Aqui, iremos criar dois diretorios: templates/mail, 
+eh nesse diretorio que vamos colocar o nosso arquivo HTML. O nome do arquivo sera aviso-lancamentos-vencidos.html.
+
+A estrutura HTML basica ja esta definida, conforme abaixo.
+
+O que iremos fazer, entao, nesta aula? Nos vamos utilizar recursos do Thymeleaf dentro do template para que, quando a gente for processar
+esse template com Thymeleaf, a gente consiga utilizar variaveis que a gente vai passar la pelo Java aqui dentro do nosso template. Entao, esse
+eh o objetivo desta aula: utilizar os recursos de template do Thymeleaf 	para deixar esse template dinamico.
+
+Repare-se que temos o body, o titulo, uma frase e uma outra tag <p> que contem uma tabela dentro dela. Em seguida, nos temos uma despedida.
+O que vai mais interessar aqui eh a tabela. Primeiramente nos temos o cabecalho da tabela e, em seguida, nos temos o corpo da tabela. Agora, nos
+vamos trabalhar, basicamente, no corpo dessa tabela, que eh onde tem as linhas e nos vamos iterar por cada Lancamento que for passado para o
+template e a gente vai gerar uma tag <tr> que eh uma linha dessa nossa tabela. 
+
+Como fazemos isso com os recursos do Thymeleaf? Observacao: o Thymeleaf nao esta no nosso PATH e ainda nao vamos coloca-lo no nosso
+PATH, porque nao eh necessario: esta aula eh para configurar o template HTML, so texto. E, quando nos formos construir o metodo que vai
+compilar esse HTML, que vai processar esse HTML e fazer o envio do e-mail, ai sim a gente adiciona a dependencia do Thymeleaf.
+
+Entao, vamos, agora, deixar esse HTML dinamico.   
+
+ -->
+ <DOCTYPE html>
+ <!-- Na tag html define-se o namespace do Thymeleaf -->
+ <html xmlns="http://www.w3.org/1999/xhtml"
+ 	xmlns:th=http://www.thymeleaf.org>
+ 
+ <body style="font-family: Arial; font-size: 14px;">
+ 
+ <p>Ola!</p>
+ 
+ <p>Existem receitas ou despesas vencidas ou vencendo hoje. Veja:</p>
+ 
+ <p>
+ 	<table style="width: 100%; border-collapse: collapse; margin: 20px 0">
+		<thead>
+			<tr>
+				<th>Tipo</th>
+				<th>Pessoa</th>
+				<th>Descricao</th>
+				<th>Vencimento</th>
+				<th>Valor</th>
+			</tr>
+		</thead>
+		<tbody>
+			<!-- Nos vamos utilizar um atributo do Thymeleaf, que eh o th:each. Com esse atributo, nos vamos iterar por uma lista. Como eh a 
+				sintaxe? th:each = variavel : expressao. A expressao sera o que a gente for passar a partir do Java. Nos vamos passar do Java
+				uma lista de Lancamentos, definida pelo nome lancamentos. 
+				A partir desse momento, nos podemos iterar pela lista e ir montando a <tr>. Como definir o valor, se eh receita ou
+				despesa, nome da pessoa, etc., dentro das tags de <td>?
+				O Thymeleaf tem um atributo chamado th:text. No th:text, temos condicoes de utilizar a variavel lancamento definida no th:each.
+				Definir, entao, uma expressao a partir de lancamento: th:text = expressao.
+				
+				Observacao: O Thymeleaf, com o atributo th:text, sobrescreve o valor definido dentro das tags <td></td>. Exemplo:
+				<td>Receita</td>. O valor Receita sera sobrescrito pelo valor definido com o atributo th:text
+			 -->
+			<!-- <tr style="border-bottom: 1px solid #ccc; border-top: 1px solid #ccc"> -->
+			<!-- tr style="border-bottom: 1px solid #ccc; border-top: 1px solid #ccc"
+					th:each="lancamento: ${lancamentos}"-->
+			<!-- Aula 22.19. Processando o Template e Enviando o Email
+				Vamos ajustar o layout do Email: o que eh Receita deve ficar em Azul e o que eh Despesa deve ficar em Vermelho.
+				O Thymeleaf tem mais uma propriedade chamada de th:styleappend. O valor dessa propriedade sera definido com um operador
+				ternario que define: se for Receita, o estilo sera apendado, ou seja, ira juntar, concatenar com o estilo existente:
+				border-bottom: 1px solid #ccc; border-top: 1px solid #ccc;
+				com o de Receita, caso contrario, sera apendado com o 
+				estilo de Despesa. Qual a vantagem em utilizar th:styleappend? Eh porque eh possivel utilizar expressoes, um operador ternario, por exemplo.
+				Para saber se eh Despesa ou Receita, vamos definir um metodo na Classe Lancamento: isReceita(). Ver a classe Lancamento.
+				Voltando ao template HTML, definimos:
+				  th:styleappend="${lancamento.receita} ? 'color: blue;' : 'color: red;'"
+				
+				Agora, devemos ir na Classe Mailer e comentar o metodo teste(), porque esse metodo eh apenas para testar a 
+				funcionalidade de envio de Email. 
+			 -->
+			<tr style="border-bottom: 1px solid #ccc; border-top: 1px solid #ccc;"
+				th:each="lancamento: ${lancamentos}"
+				th:styleappend="${lancamento.receita} ? 'color: blue;' : 'color: red;'">					
+				<!-- <td>Receita</td> -->
+				<td th:text="${lancamento.tipo.descricao}">Receita</td>
+				<!-- <td>João Silva</td> -->
+				<td th:text="${lancamento.pessoa.nome}">João Silva</td>
+				<!-- <td>Salário Mensal</td> -->
+				<td th:text="${lancamento.descricao}">Salário Mensal</td>
+				<!-- td style="text-align: center">10/06/2018</td-->
+				<!-- O atributo dataVencimento precisa ser formatado. Entao, vamos nos utilizar um recurso do Thymeleaf 
+					que eh uma propriedade chamada #temporals, que tem um metodo chamado format(). Nesse metodo format(), nos passamos,
+					como primeiro parametro, o valor, que eh a dataVencimento, e o segundo parametro nos passamos como deve ser formatado
+					a data.  
+				 -->				
+				<td th:text="${#temporals.format(lancamento.dataVencimento, 'dd/MM/yyyy')}" 
+						style="text-align: center">10/06/2018
+				</td>
+				<!-- <td style="text-align: right">R$ 10.000,00</td> -->
+				<!-- De forma semelhante a dataVencimento, nos iremos formatar o atributo valor. Nesse caso, eh utilizado a propriedade
+					#numbers do Thymeleaf, que tem o metodo formatDecimal(). O primeiro parametro a ser passado eh o valor do atributo
+					lancamento.valor e o segundo parametro eh o numero minimo de digitos inteiros. Por exemplo, se o valor eh R$ 10,00,
+					se definirmos 3, como sera apresentado? Sera apresentado como R$ 010,00. O que nos queremos definir eh o valor 
+					minimo como sendo 0, porque, se nao tiver nada, pode-se deixar sem digito nenhum.
+					O terceiro parametro define o separador de milhar. Vamos definir como POINT (.).
+					O quarto parametro definie o numero de casas decimais. Vamos definir 2. 
+					O quinto parametro define define como queremos que as casas decimais sejam separadas. Vamos definir com a virgula: COMMA. 
+					-->
+				<td th:text="${#numbers.formatDecimal(lancamento.valor, 0, 'POINT', 2, 'COMMA')}" 
+						style="text-align: right">R$ 10.000,00
+				</td>
+			</tr>
+		</tbody>
+ 	</table>
+ </p>
+ 
+ <p>Obrigado,</p>
+ <p>Equipe Algamoney</p>
+ 
+ </body>
+ </html>

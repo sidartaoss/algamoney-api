@@ -3,6 +3,7 @@ package com.example.algamoney.api;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 
 import com.example.algamoney.api.config.property.AlgamoneyApiProperty;
 
@@ -22,8 +23,35 @@ import com.example.algamoney.api.config.property.AlgamoneyApiProperty;
 @EnableConfigurationProperties(AlgamoneyApiProperty.class)
 public class AlgamoneyApiApplication {
 
+	/**
+	 * Aula 22.36. Configurando URL do Anexo
+	 * 5. Vamos criar uma instancia estatica e privada de ApplicationContext do Spring.
+	 * Nao pode ser final, porque nos vamos acessa-la dentro do metodo main() e vamos
+	 * chamar de application_context. Para ficar tudo maiusculo: CTRL+SHIFT+X
+	 * */
+	private static ApplicationContext APPLICATION_CONTEXT;
+	
 	public static void main(String[] args) {
-		SpringApplication.run(AlgamoneyApiApplication.class, args);
+		/**
+		 * Aula 22.36. Configurando URL do Anexo
+		 * 6. Aqui, o retorno do metodo run nos sabemos que eh um
+		 * retorno que implementa a interface ApplicationContext.
+		 * Entao, nos vamos passar o retorno para a instancia APPLICATION_CONTEXT.
+		 * */
+		APPLICATION_CONTEXT = SpringApplication.run(AlgamoneyApiApplication.class, args);
+	}
+	
+	/**
+	 * Aula 22.36. Configurando URL do Anexo
+	 * 7. E aqui, nos vamos criar um metodo estatico que nos iremos chamar de getBean().
+	 * 7.1. Esse metodo ira receber, como parametro, o tipo desse Bean.
+	 * 7.2. Esse metodo ira retornar uma instancia do tipo recebido como parametro.
+	 * 7.3. Esse metodo consegue retornar uma instancia, por exemplo, da classe S3. Pode retornar
+	 * de qualquer classe. No caso desta aula, nos queremos da classe S3.
+	 * Voltar para a Classe LancamentoAnexoListener.java.
+	 * */
+	public static <T> T getBean(Class<T> type) {
+		return APPLICATION_CONTEXT.getBean(type);
 	}
 }
 

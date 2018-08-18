@@ -1,5 +1,7 @@
 package com.example.algamoney.api.resource;
 
+import java.util.Optional;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
@@ -80,12 +82,29 @@ public class PessoaResource {
 		this.publisher.publishEvent(new RecursoCriadoEvent(this, response, pessoaSalva.getCodigo()));
 		return ResponseEntity.status(HttpStatus.CREATED).body(pessoaSalva);
 	}
+	
+	/**
+	 * Aula 25.02. Novas Assinaturas do Spring Data JPA
+	 * 
+	 * 15. Com a migracao para o Spring Boot 2, corrigir o metodo buscarPeloCodigo(), substituindo o metodo findOne() por findById().
+	 * Vamos corrigir o retorno tambem, return pessoa.isPresent() ? ResponseEntity.ok(pessoa.get()) : ResponseEntity.notFound().build();
+	 * 
+	 * 16. Mais abaixo, no metodo remover(), substituir o metodo delete() por deleteById(). O restante, continua a mesma coisa.
+	 * 
+	 * 17. Okay, esta corrigido a atualizacao com relacao ao Spring Data JPA 2, que eh a versao que esta vindo, agora, com o Spring Boot.
+	 * Fim da Aula 25.02. Novas Assinaturas do Spring Data JPA.
+	 * 
+	 * @param codigo
+	 * @return
+	 */
 
 	@PreAuthorize("hasAuthority('ROLE_PESQUISAR_PESSOA') and #oauth2.hasScope('read')")
 	@GetMapping("/{codigo}")
 	public ResponseEntity<Pessoa> buscarPeloCodigo(@PathVariable Long codigo) {
-		Pessoa pessoa = pessoaRepository.findOne(codigo);
-		return pessoa != null ? ResponseEntity.ok(pessoa) : ResponseEntity.notFound().build();
+		/** Pessoa pessoa = pessoaRepository.findOne(codigo); **/
+		Optional<Pessoa> pessoa = pessoaRepository.findById(codigo);
+		/** return pessoa != null ? ResponseEntity.ok(pessoa) : ResponseEntity.notFound().build(); **/
+		return pessoa.isPresent() ? ResponseEntity.ok(pessoa.get()) : ResponseEntity.notFound().build();
 	}
 	
 	@GetMapping(params = "codigo")
@@ -99,7 +118,8 @@ public class PessoaResource {
 	@DeleteMapping("/{codigo}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void remover(@PathVariable Long codigo) {
-		pessoaRepository.delete(codigo);
+		/** pessoaRepository.delete(codigo); **/
+		pessoaRepository.deleteById(codigo);
 	}
 	
 	/** 1. **/
