@@ -40,7 +40,7 @@
 *
 * 3. Outra coisa que iremos fazer eh a atualizacao de duas dependencias relacionadas ao Spring Security, que sao:
 	<properties>
-		<spring-security-oauth2.version>2.2.1.RELEASE</spring-security-oauth2.version>
+		<spring-security-oauth2.version>2.2.5.RELEASE</spring-security-oauth2.version>
 		<spring-security-jwt.version>1.0.9.RELEASE</spring-security-jwt.version>
 	</properties>
 	
